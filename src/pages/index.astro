@@ -1,0 +1,39 @@
+---
+import BaseLayout from './../layouts/BaseLayout.astro';
+
+import { Image } from 'astro:assets';
+import Hero from './../images/Hero.svg'
+---
+<BaseLayout>
+	<section class="container py-8">
+		<div class="grid md:grid-cols-2 md:items-center md:gap-8">
+			<div class="h-fit borders">
+				<h1 class="text-2xl lg:text-3xl mb-4">Hi everybody! I am <b class="text-yellow-600">Agung</b>,<br/> and I am very happy to welcome you to my website. </h1>
+				
+				<div class="lg:text-lg">
+					<p>I created this website for <b class="text-yellow-600">documentation and portfolio.</b></p>
+					<p>Even though my educational background is not in the IT field, I have a great interest in the digital world, especially in terms of web development. I always enjoy learning new things about web development and trying out the different techniques and tools available.</p>
+				</div>
+				
+				<ul>
+					<li><a></a></li>
+				</ul>
+			</div>
+			<div>
+				<Image src={Hero} alt="hero" />
+			</div>
+		</div>
+	</section>
+	<section id="blog" class="container py-8">
+		<h2 class="lg:text-2xl mb-4">Blog Posts</h2>
+		<div>
+			<p>no posts yet</p>
+		</div>
+	</section>
+	<section id="project" class="container py-8">
+		<h2 class="lg:text-2xl mb-4">My Project</h2>
+		<div class="p-4">
+			<p>project coming soon</p>
+		</div>
+	</section>
+</BaseLayout>
