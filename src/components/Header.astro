@@ -1,13 +1,210 @@
 ---
+import DarkModeToggle from "./DarkMode.astro";
 ---
 
-<header>
-	<div class="container py-8 flex justify-between">
-		<a href="/" class="text-xl font-light">Agung</a>
-		<nav class="space-x-4">
-			<a href="/">Home</a>
-			<a href="#blog">Blog</a>
-			<a href="#project">Project</a>
+<header
+	class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
+>
+	<div class="container mx-auto px-4 py-4 flex justify-between items-center">
+		<a href="/" class="text-xl font-bold">Agung</a>
+
+		<!-- Desktop Navigation -->
+		<nav class="hidden md:flex space-x-8">
+			<a
+				href="/about"
+				class="hover:text-blue-600 dark:hover:text-blue-400 transition"
+				>About</a
+			>
+			<a
+				href="#projects"
+				class="hover:text-blue-600 dark:hover:text-blue-400 transition"
+				>Projects</a
+			>
+			<a
+				href="#contact"
+				class="hover:text-blue-600 dark:hover:text-blue-400 transition"
+				>Contact</a
+			>
 		</nav>
+
+		<div class="flex items-center gap-4">
+			<DarkModeToggle />
+
+			<!-- Mobile menu button -->
+			<button
+				id="mobileMenuButton"
+				class="md:hidden p-2"
+				aria-label="Toggle menu"
+			>
+				<svg
+					id="menuIcon"
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 6h16M4 12h16M4 18h16"></path>
+				</svg>
+				<svg
+					id="closeIcon"
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6 hidden"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+			</button>
+		</div>
+	</div>
+
+	<!-- Mobile Menu Offcanvas -->
+	<div
+		id="mobileMenu"
+		class="md:hidden fixed inset-0 z-40 bg-white dark:bg-gray-900 translate-y-full transition-transform duration-300 ease-in-out"
+	>
+		<div
+			class="container mx-auto px-4 py-20 h-full flex flex-col justify-center"
+		>
+			<nav class="space-y-8">
+				<a
+					href=".about"
+					class="nav-item block text-2xl font-medium opacity-0 translate-y-4 transition-all duration-300 ease-out"
+					>About</a
+				>
+				<a
+					href="#projects"
+					class="nav-item block text-2xl font-medium opacity-0 translate-y-4 transition-all duration-300 ease-out"
+					>Projects</a
+				>
+				<a
+					href="#contact"
+					class="nav-item block text-2xl font-medium opacity-0 translate-y-4 transition-all duration-300 ease-out"
+					>Contact</a
+				>
+			</nav>
+		</div>
 	</div>
 </header>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const mobileMenuButton = document.getElementById("mobileMenuButton");
+		const mobileMenu = document.getElementById("mobileMenu");
+		const menuIcon = document.getElementById("menuIcon");
+		const closeIcon = document.getElementById("closeIcon");
+		const navItems = document.querySelectorAll(".nav-item");
+
+		let menuOpen = false;
+		let animationTimeouts = [];
+
+		function resetAnimations() {
+			// Clear all pending timeouts
+			animationTimeouts.forEach((timeout) => clearTimeout(timeout));
+			animationTimeouts = [];
+
+			// Reset all items
+			navItems.forEach((item) => {
+				item.classList.add("opacity-0", "translate-y-4");
+			});
+		}
+
+		function openMenu() {
+			if (menuOpen) return;
+
+			resetAnimations();
+			menuOpen = true;
+			menuIcon.classList.add("hidden");
+			closeIcon.classList.remove("hidden");
+			mobileMenu.classList.remove("translate-y-full");
+
+			// Animate each item with stagger effect
+			navItems.forEach((item, index) => {
+				animationTimeouts.push(
+					setTimeout(() => {
+						item.classList.remove("opacity-0", "translate-y-4");
+					}, 100 * index), // 100ms delay between each item
+				);
+			});
+		}
+
+		function closeMenu() {
+			if (!menuOpen) return;
+
+			resetAnimations();
+			menuOpen = false;
+			menuIcon.classList.remove("hidden");
+			closeIcon.classList.add("hidden");
+
+			// Animate out in reverse order
+			const reversedItems = Array.from(navItems).reverse();
+			reversedItems.forEach((item, index) => {
+				animationTimeouts.push(
+					setTimeout(() => {
+						item.classList.add("opacity-0", "translate-y-4");
+					}, 80 * index), // Slightly faster when closing
+				);
+			});
+
+			// Close menu after animations complete
+			animationTimeouts.push(
+				setTimeout(() => {
+					mobileMenu.classList.add("translate-y-full");
+				}, 80 * navItems.length),
+			);
+		}
+
+		mobileMenuButton.addEventListener("click", () => {
+			if (menuOpen) {
+				closeMenu();
+			} else {
+				openMenu();
+			}
+		});
+
+		// Close menu when clicking on nav items
+		navItems.forEach((item) => {
+			item.addEventListener("click", closeMenu);
+		});
+
+		// Close menu when pressing Escape key
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape" && menuOpen) {
+				closeMenu();
+			}
+		});
+	});
+</script>
+
+<style>
+	#mobileMenu {
+		top: 72px; /* Height of header */
+		height: calc(100vh - 72px);
+		will-change: transform;
+	}
+
+	.nav-item {
+		transition-property: transform, opacity;
+		transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+		will-change: transform, opacity;
+	}
+
+	.nav-item:hover {
+		color: #3b82f6; /* blue-500 */
+		transform: translateX(4px);
+	}
+
+	.dark .nav-item:hover {
+		color: #60a5fa; /* blue-400 */
+	}
+</style>
